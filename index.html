@@ -146,21 +146,36 @@
     }
 
     #clock {
+      display: none;
+    }
+
+    .global-clocks {
+      display: flex;
+      gap: 16px;
+      align-items: center;
       color: var(--amber);
       font-size: 16px;
-      /* Increased from 14px */
+      font-weight: 600;
+    }
+
+    .global-clocks span {
+      color: #fff;
+      margin-left: 4px;
+      font-family: var(--mono);
     }
 
     #countdown {
       color: var(--cyan);
+      font-size: 16px;
+      font-weight: bold;
     }
 
     /* ─── TICKER ─── */
     .ticker-bar {
       background: var(--red2);
       overflow: hidden;
-      padding: 8px 0;
-      /* Increased from 6px */
+      padding: 10px 0;
+      /* Increased from 8px */
       position: relative;
     }
 
@@ -170,9 +185,9 @@
       white-space: nowrap;
       animation: ticker 40s linear infinite;
       font-family: var(--mono);
-      font-size: 14px;
-      /* Increased from 12px */
-      letter-spacing: 1px;
+      font-size: 16px;
+      /* Increased from 14px */
+      letter-spacing: 1.5px;
       color: #fff;
     }
 
@@ -230,8 +245,8 @@
 
     .panel-title {
       font-family: var(--display);
-      font-size: 15px;
-      /* Increased from 13px */
+      font-size: 18px;
+      /* Further increased */
       font-weight: 600;
       letter-spacing: 3px;
       text-transform: uppercase;
@@ -240,10 +255,11 @@
 
     .panel-badge {
       font-family: var(--mono);
-      font-size: 12px;
-      /* Increased from 10px */
+      font-size: 14px;
+      /* Further increased */
       color: var(--dim);
       letter-spacing: 1px;
+      font-weight: bold;
     }
 
     /* ─── CASUALTY GRID ─── */
@@ -300,12 +316,12 @@
 
     .nation-name {
       font-family: var(--display);
-      font-size: 22px;
-      /* Increased from 18px */
+      font-size: 26px;
+      /* 22px to 26px */
       font-weight: 700;
       letter-spacing: 2px;
       color: #fff;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
       text-transform: uppercase;
     }
 
@@ -313,32 +329,32 @@
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      margin-bottom: 10px;
-      /* Increased from 8px */
+      margin-bottom: 12px;
       border-bottom: 1px solid var(--border);
-      padding-bottom: 10px;
+      padding-bottom: 12px;
     }
 
     .stat-label {
       font-family: var(--mono);
-      font-size: 12px;
-      /* Increased from 10px */
+      font-size: 14px;
+      /* 12px to 14px */
       color: var(--dim);
       letter-spacing: 1px;
       text-transform: uppercase;
+      font-weight: bold;
     }
 
     .stat-value {
       font-family: var(--mono);
-      font-size: 28px;
-      /* Increased from 22px */
+      font-size: 34px;
+      /* 28px to 34px */
       font-weight: bold;
       line-height: 1;
     }
 
     .stat-value.red {
       color: var(--red);
-      text-shadow: 0 0 12px rgba(255, 34, 51, 0.5);
+      text-shadow: 0 0 16px rgba(255, 34, 51, 0.6);
     }
 
     .stat-value.amber {
@@ -358,34 +374,64 @@
     .sub-stats {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      /* Increased from 6px */
-      margin-top: 12px;
-      /* Increased from 10px */
+      gap: 10px;
+      margin-top: 16px;
     }
 
     .sub-stat {
       background: var(--bg);
-      padding: 8px 10px;
-      /* Increased padding */
+      padding: 12px;
+      border-radius: 4px;
     }
 
     .sub-stat-label {
       font-family: var(--mono);
-      font-size: 11px;
+      font-size: 12px;
       color: var(--dim);
       text-transform: uppercase;
       letter-spacing: 1px;
+      font-weight: bold;
     }
 
-    /* 9px to 11px */
     .sub-stat-val {
       font-family: var(--mono);
-      font-size: 15px;
+      font-size: 18px;
       color: var(--text);
+      font-weight: bold;
+      margin-top: 4px;
     }
 
-    /* 13px to 15px */
+    /* Market Tickers inside Global Impact */
+    .market-list {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .market-item {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: bold;
+      padding: 4px 0;
+      border-bottom: 1px dotted var(--border);
+    }
+
+    .market-gainer {
+      color: var(--green);
+      text-shadow: 0 0 8px rgba(0, 255, 136, 0.2);
+    }
+
+    .market-loser {
+      color: var(--red);
+      text-shadow: 0 0 8px rgba(255, 34, 51, 0.2);
+    }
+
+    .market-asset {
+      color: var(--text);
+    }
 
     /* ─── EVENT FEED ─── */
     .event-feed-panel {
@@ -442,24 +488,25 @@
     .event-meta {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
     }
 
     .event-time {
       font-family: var(--mono);
-      font-size: 13px;
+      font-size: 14px;
       color: var(--amber);
+      font-weight: bold;
     }
 
-    /* 11px to 13px */
     .event-severity {
       font-family: var(--mono);
-      font-size: 11px;
-      /* 9px to 11px */
+      font-size: 12px;
+      font-weight: bold;
       letter-spacing: 2px;
-      padding: 3px 8px;
+      padding: 4px 10px;
       display: inline-block;
       width: fit-content;
+      border-radius: 2px;
     }
 
     .event-severity.critical {
@@ -484,29 +531,27 @@
 
     .event-headline {
       font-family: var(--body);
-      font-size: 17px;
-      font-weight: 600;
+      font-size: 20px;
+      font-weight: 700;
       color: #fff;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
       line-height: 1.4;
     }
 
-    /* 15px to 17px */
     .event-detail {
-      font-size: 15px;
+      font-size: 17px;
       color: var(--text);
-      line-height: 1.5;
+      line-height: 1.6;
     }
 
-    /* 13px to 15px, better line height */
     .event-source {
       font-family: var(--mono);
-      font-size: 12px;
+      font-size: 13px;
       color: var(--dim);
-      margin-top: 6px;
+      margin-top: 8px;
+      font-weight: bold;
     }
 
-    /* 10px to 12px */
     .event-source a {
       color: var(--blue);
       text-decoration: none;
@@ -577,34 +622,32 @@
     }
 
     .ai-content {
-      padding: 20px;
-      /* Increased from 16px */
+      padding: 24px;
       font-family: var(--body);
-      font-size: 17px;
-      /* Increased from 15px */
-      line-height: 1.8;
-      /* Increased from 1.7 */
+      font-size: 20px;
+      /* HUGE readable text */
+      line-height: 1.7;
       color: var(--text);
-      max-height: 400px;
-      /* Increased from 360px */
+      max-height: 500px;
       overflow-y: auto;
       scrollbar-width: thin;
       scrollbar-color: var(--amber2) var(--bg);
     }
 
     .ai-content p {
-      margin-bottom: 16px;
-      font-weight: 400;
+      margin-bottom: 20px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
     }
 
     .ai-loading {
       display: flex;
       align-items: center;
-      gap: 14px;
-      padding: 20px;
+      gap: 16px;
+      padding: 24px;
       font-family: var(--mono);
-      font-size: 15px;
-      /* Increased from 13px */
+      font-size: 16px;
+      font-weight: bold;
       color: var(--dim);
     }
 
@@ -677,28 +720,27 @@
     .region-card {
       background: var(--bg);
       border: 1px solid var(--border);
-      padding: 16px;
-      /* Increased from 12px */
+      padding: 20px;
       position: relative;
+      border-radius: 4px;
     }
 
     .region-name {
       font-family: var(--display);
-      font-size: 16px;
-      font-weight: 600;
+      font-size: 20px;
+      font-weight: 700;
       color: #fff;
       letter-spacing: 2px;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
 
-    /* 14px to 16px */
     .region-status {
       font-family: var(--mono);
-      font-size: 12px;
+      font-size: 14px;
       letter-spacing: 1px;
+      font-weight: bold;
     }
 
-    /* 10px to 12px */
     .region-status.active-conflict {
       color: var(--red);
     }
@@ -717,11 +759,10 @@
 
     .region-dot {
       display: inline-block;
-      width: 8px;
-      height: 8px;
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
-      /* 6px to 8px */
-      margin-right: 6px;
+      margin-right: 8px;
       vertical-align: middle;
     }
 
@@ -781,32 +822,33 @@
       color: var(--amber);
       border: 1px solid var(--border);
       font-family: var(--mono);
-      font-size: 13px;
-      /* 11px to 13px */
-      padding: 6px;
+      font-size: 14px;
+      padding: 8px;
+      font-weight: bold;
       text-transform: uppercase;
       cursor: pointer;
+      border-radius: 44px;
     }
 
     .chat-history {
       flex-grow: 1;
-      padding: 16px;
+      padding: 20px;
       overflow-y: auto;
       scrollbar-width: thin;
       scrollbar-color: var(--blue) var(--bg);
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 20px;
       font-family: var(--body);
-      font-size: 16px;
-      /* 14px to 16px */
-      line-height: 1.5;
-      max-height: 350px;
+      font-size: 18px;
+      /* Big chat text */
+      line-height: 1.6;
+      max-height: 450px;
     }
 
     .chat-msg {
-      padding: 10px 14px;
-      border-radius: 4px;
+      padding: 14px 18px;
+      border-radius: 6px;
       max-width: 90%;
       background: var(--panel2);
       border: 1px solid var(--border);
@@ -817,6 +859,7 @@
       border-color: var(--blue);
       background: rgba(0, 170, 255, 0.05);
       color: #fff;
+      font-weight: 600;
     }
 
     .chat-msg.ai {
@@ -828,8 +871,8 @@
       align-self: center;
       text-align: center;
       font-family: var(--mono);
-      font-size: 12px;
-      /* 10px to 12px */
+      font-size: 13px;
+      font-weight: bold;
       color: var(--dim);
       line-height: 1.4;
       max-width: 100%;
@@ -934,7 +977,12 @@
     </div>
     <div class="header-right">
       <div><span class="live-dot"></span>LIVE</div>
-      <div id="clock">--:--:-- UTC</div>
+      <div class="global-clocks">
+        <div>DC: <span id="time-dc">--:--:--</span></div>
+        <div>AST: <span id="time-ast">--:--:--</span></div>
+        <div>TEH: <span id="time-teh">--:--:--</span></div>
+        <div>TLV: <span id="time-tlv">--:--:--</span></div>
+      </div>
       <div>AUTO-REFRESH: <span id="countdown" class="status-ok">5:00</span></div>
       <button class="refresh-btn" onclick="triggerRefresh()">↻ REFRESH NOW</button>
     </div>
@@ -1102,12 +1150,16 @@
         </div>
         <div class="sub-stats">
           <div class="sub-stat">
-            <div class="sub-stat-label">Airspace</div>
-            <div class="sub-stat-val" id="global-airspace" style="font-size:12px;">—</div>
+            <div class="sub-stat-label" style="color:var(--green)">TOP GAINERS</div>
+            <div class="market-list" id="global-gainers">
+              <span class="sub-stat-val" style="font-size:12px; font-weight:normal;">WAITING FOR DATA...</span>
+            </div>
           </div>
           <div class="sub-stat">
-            <div class="sub-stat-label">UN Response</div>
-            <div class="sub-stat-val" id="global-un" style="font-size:12px;">—</div>
+            <div class="sub-stat-label" style="color:var(--red)">TOP LOSERS</div>
+            <div class="market-list" id="global-losers">
+              <span class="sub-stat-val" style="font-size:12px; font-weight:normal;">WAITING FOR DATA...</span>
+            </div>
           </div>
         </div>
       </div>
@@ -1347,8 +1399,21 @@
     // ─── CLOCK ────────────────────────────────────────────────────────────────────
     function updateClock() {
       const now = new Date();
-      document.getElementById('clock').textContent =
-        now.toUTCString().split(' ').slice(4, 5)[0] + ' UTC';
+
+      const formatTime = (tz) => new Intl.DateTimeFormat('en-US', {
+        timeZone: tz,
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        hour12: false
+      }).format(now);
+
+      try {
+        document.getElementById('time-dc').textContent = formatTime('America/New_York');
+        document.getElementById('time-ast').textContent = formatTime('America/Halifax');
+        document.getElementById('time-teh').textContent = formatTime('Asia/Tehran');
+        document.getElementById('time-tlv').textContent = formatTime('Asia/Jerusalem');
+      } catch (e) {
+        console.error("Timezone error:", e);
+      }
     }
     setInterval(updateClock, 1000);
     updateClock();

@@ -1,7 +1,7 @@
 const { GoogleGenAI } = require("@google/genai");
 
 // Note: Ensure GEMINI_API_KEY is set in Vercel environment variables.
-const ai = new GoogleGenAI({}); 
+const ai = new GoogleGenAI({});
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
@@ -11,7 +11,9 @@ module.exports = async (req, res) => {
   try {
     const prompt = `You are an intelligence briefing system monitoring the Iran-Israel-US conflict that began on February 28, 2026. Search the web for the very latest news right now and provide:
 
-1. A concise intelligence briefing (3-4 paragraphs) covering:
+1. A concise intelligence briefing (3-4 paragraphs). 
+You MUST start the very first line of your briefing with this exact bolded timestamp format: **[PUBLISHED: MM/DD/YYYY - HH:MM UTC]** 
+Covering:
    - Current military situation: what's happening right now
    - Latest casualty figures confirmed for Iran, Israel, and US forces
    - Status of Ayatollah Khamenei (confirmed dead or alive?)
@@ -26,7 +28,24 @@ module.exports = async (req, res) => {
   "israel": { "dead": "number", "injured": "number", "militaryDead": "number", "civilianDead": "number", "missilesIntercepted": "number", "missilesFired": "number" },
   "us": { "dead": "number", "injured": "number", "militaryDead": "number", "basesHit": "number", "assetsLost": "number or unknown", "sorties": "number or unknown" },
   "proxies": { "activeFronts": "number", "attacksLaunched": "number", "hezbollah": "status", "houthis": "status", "kataibHB": "status", "hamas": "status" },
-  "global": { "oilPrice": "number or status", "straitOfHormuz": "status", "airspaceClosed": "list or status", "unResponse": "status" },
+  "global": { 
+    "oilPrice": "number or status", 
+    "straitOfHormuz": "status",
+    "topDrop": [
+      { "asset": "name of dropping stock/resource", "change": "-X%" },
+      { "asset": "name of dropping stock/resource", "change": "-X%" },
+      { "asset": "name of dropping stock/resource", "change": "-X%" },
+      { "asset": "name of dropping stock/resource", "change": "-X%" },
+      { "asset": "name of dropping stock/resource", "change": "-X%" }
+    ],
+    "topGain": [
+      { "asset": "name of gaining stock/resource", "change": "+X%" },
+      { "asset": "name of gaining stock/resource", "change": "+X%" },
+      { "asset": "name of gaining stock/resource", "change": "+X%" },
+      { "asset": "name of gaining stock/resource", "change": "+X%" },
+      { "asset": "name of gaining stock/resource", "change": "+X%" }
+    ]
+  },
   "events": [
     { "time": "HH:MM UTC", "severity": "critical|major|info", "headline": "...", "detail": "...", "source": "outlet name" }
   ]
