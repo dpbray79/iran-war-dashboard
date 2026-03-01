@@ -1,1099 +1,1481 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IRAN CONFLICT — LIVE COMMAND DASHBOARD</title>
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Oswald:wght@300;400;600;700&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #050508;
-    --panel: #0a0b10;
-    --panel2: #0f1018;
-    --border: #1e2230;
-    --red: #ff2233;
-    --red2: #cc0011;
-    --amber: #ffb000;
-    --amber2: #cc8800;
-    --green: #00ff88;
-    --blue: #00aaff;
-    --cyan: #00e5ff;
-    --text: #c8ccd8;
-    --dim: #5a6080;
-    --mono: 'Share Tech Mono', monospace;
-    --display: 'Oswald', sans-serif;
-    --body: 'Rajdhani', sans-serif;
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IRAN CONFLICT — LIVE COMMAND DASHBOARD</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Oswald:wght@300;400;600;700&family=Rajdhani:wght@300;400;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #050508;
+      --panel: #0a0b10;
+      --panel2: #0f1018;
+      --border: #1e2230;
+      --red: #ff2233;
+      --red2: #cc0011;
+      --amber: #ffb000;
+      --amber2: #cc8800;
+      --green: #00ff88;
+      --blue: #00aaff;
+      --cyan: #00e5ff;
+      --text: #e0e4f0;
+      /* Slightly brighter text for --text */
+      --dim: #7a82a0;
+      /* Brighter contrast for --dim labels */
+      --mono: 'Share Tech Mono', monospace;
+      --display: 'Oswald', sans-serif;
+      --body: 'Rajdhani', sans-serif;
+    }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--body);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--body);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
 
-  /* Scanline overlay */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: repeating-linear-gradient(
-      to bottom,
-      transparent 0px,
-      transparent 3px,
-      rgba(0,0,0,0.08) 3px,
-      rgba(0,0,0,0.08) 4px
-    );
-    pointer-events: none;
-    z-index: 9999;
-  }
+    /* Scanline overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(to bottom,
+          transparent 0px,
+          transparent 3px,
+          rgba(0, 0, 0, 0.08) 3px,
+          rgba(0, 0, 0, 0.08) 4px);
+      pointer-events: none;
+      z-index: 9999;
+    }
 
-  /* Grid noise texture */
-  body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 9998;
-    opacity: 0.4;
-  }
+    /* Grid noise texture */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9998;
+      opacity: 0.4;
+    }
 
-  /* ─── HEADER ─── */
-  header {
-    background: var(--panel);
-    border-bottom: 2px solid var(--red2);
-    padding: 12px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 0 40px rgba(255,34,51,0.15);
-  }
+    /* ─── HEADER ─── */
+    header {
+      background: var(--panel);
+      border-bottom: 2px solid var(--red2);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 0 40px rgba(255, 34, 51, 0.15);
+    }
 
-  .header-left {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
 
-  .alert-badge {
-    background: var(--red);
-    color: #fff;
-    font-family: var(--mono);
-    font-size: 11px;
-    padding: 4px 10px;
-    letter-spacing: 2px;
-    animation: blink 1s step-end infinite;
-  }
+    .alert-badge {
+      background: var(--red);
+      color: #fff;
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 4px 10px;
+      letter-spacing: 2px;
+      animation: blink 1s step-end infinite;
+    }
 
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.2; }
-  }
+    @keyframes blink {
 
-  .header-title {
-    font-family: var(--display);
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: 3px;
-    color: #fff;
-    text-transform: uppercase;
-  }
+      0%,
+      100% {
+        opacity: 1;
+      }
 
-  .header-title span { color: var(--red); }
+      50% {
+        opacity: 0.2;
+      }
+    }
 
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--dim);
-  }
+    .header-title {
+      font-family: var(--display);
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: #fff;
+      text-transform: uppercase;
+    }
 
-  .live-dot {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    background: var(--red);
-    border-radius: 50%;
-    margin-right: 6px;
-    animation: blink 1.2s ease-in-out infinite;
-    box-shadow: 0 0 8px var(--red);
-  }
+    .header-title span {
+      color: var(--red);
+    }
 
-  #clock { color: var(--amber); font-size: 14px; }
-  #countdown { color: var(--cyan); }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      font-family: var(--mono);
+      font-size: 14px;
+      /* Increased from 12px */
+      color: var(--dim);
+    }
 
-  /* ─── TICKER ─── */
-  .ticker-bar {
-    background: var(--red2);
-    overflow: hidden;
-    padding: 6px 0;
-    position: relative;
-  }
-  .ticker-track {
-    display: flex;
-    gap: 60px;
-    white-space: nowrap;
-    animation: ticker 40s linear infinite;
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: 1px;
-    color: #fff;
-  }
-  @keyframes ticker {
-    0% { transform: translateX(100vw); }
-    100% { transform: translateX(-100%); }
-  }
-  .ticker-item::before { content: '◆ '; color: rgba(255,255,255,0.5); }
+    .live-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: var(--red);
+      border-radius: 50%;
+      margin-right: 6px;
+      animation: blink 1.2s ease-in-out infinite;
+      box-shadow: 0 0 8px var(--red);
+    }
 
-  /* ─── MAIN LAYOUT ─── */
-  .main {
-    display: grid;
-    grid-template-columns: 1fr 340px;
-    grid-template-rows: auto auto auto;
-    gap: 12px;
-    padding: 12px;
-    max-width: 1600px;
-    margin: 0 auto;
-  }
+    #clock {
+      color: var(--amber);
+      font-size: 16px;
+      /* Increased from 14px */
+    }
 
-  /* ─── PANELS ─── */
-  .panel {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    position: relative;
-    overflow: hidden;
-  }
-  .panel::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--red2), var(--amber), transparent);
-  }
-  .panel-header {
-    padding: 10px 16px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .panel-title {
-    font-family: var(--display);
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--amber);
-  }
-  .panel-badge {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--dim);
-    letter-spacing: 1px;
-  }
+    #countdown {
+      color: var(--cyan);
+    }
 
-  /* ─── CASUALTY GRID ─── */
-  .casualty-grid {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 2px;
-    background: var(--border);
-    border: 1px solid var(--border);
-  }
+    /* ─── TICKER ─── */
+    .ticker-bar {
+      background: var(--red2);
+      overflow: hidden;
+      padding: 8px 0;
+      /* Increased from 6px */
+      position: relative;
+    }
 
-  .nation-card {
-    background: var(--panel2);
-    padding: 20px;
-    position: relative;
-    overflow: hidden;
-  }
-  .nation-card::after {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 3px;
-  }
-  .nation-card.iran::after { background: #009900; }
-  .nation-card.israel::after { background: #0038b8; }
-  .nation-card.usa::after { background: #b22234; }
-  .nation-card.proxies::after { background: #ffd700; }
-  .nation-card.global::after { background: var(--cyan); }
+    .ticker-track {
+      display: flex;
+      gap: 60px;
+      white-space: nowrap;
+      animation: ticker 40s linear infinite;
+      font-family: var(--mono);
+      font-size: 14px;
+      /* Increased from 12px */
+      letter-spacing: 1px;
+      color: #fff;
+    }
 
-  .nation-flag {
-    font-size: 28px;
-    margin-bottom: 8px;
-    display: block;
-  }
-  .nation-name {
-    font-family: var(--display);
-    font-size: 18px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    color: #fff;
-    margin-bottom: 16px;
-    text-transform: uppercase;
-  }
-  .stat-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 8px;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 8px;
-  }
-  .stat-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--dim);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-  .stat-value {
-    font-family: var(--mono);
-    font-size: 22px;
-    font-weight: bold;
-    line-height: 1;
-  }
-  .stat-value.red { color: var(--red); text-shadow: 0 0 12px rgba(255,34,51,0.5); }
-  .stat-value.amber { color: var(--amber); text-shadow: 0 0 12px rgba(255,176,0,0.4); }
-  .stat-value.green { color: var(--green); text-shadow: 0 0 12px rgba(0,255,136,0.4); }
-  .stat-value.blue { color: var(--blue); }
+    @keyframes ticker {
+      0% {
+        transform: translateX(100vw);
+      }
 
-  .sub-stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px;
-    margin-top: 10px;
-  }
-  .sub-stat {
-    background: var(--bg);
-    padding: 6px 8px;
-  }
-  .sub-stat-label { font-family: var(--mono); font-size: 9px; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; }
-  .sub-stat-val { font-family: var(--mono); font-size: 13px; color: var(--text); }
+      100% {
+        transform: translateX(-100%);
+      }
+    }
 
-  /* ─── EVENT FEED ─── */
-  .event-feed-panel {
-    grid-column: 1;
-  }
-  .event-feed {
-    padding: 0;
-    max-height: 500px;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--red2) var(--bg);
-  }
-  .event-item {
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--border);
-    display: grid;
-    grid-template-columns: 100px 1fr;
-    gap: 12px;
-    transition: background 0.2s;
-    opacity: 0;
-    animation: fadeIn 0.5s forwards;
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateX(-8px); }
-    to { opacity: 1; transform: translateX(0); }
-  }
-  .event-item:hover { background: var(--panel2); }
-  .event-item.critical { border-left: 3px solid var(--red); }
-  .event-item.major { border-left: 3px solid var(--amber); }
-  .event-item.info { border-left: 3px solid var(--dim); }
+    .ticker-item::before {
+      content: '◆ ';
+      color: rgba(255, 255, 255, 0.5);
+    }
 
-  .event-meta { display: flex; flex-direction: column; gap: 4px; }
-  .event-time { font-family: var(--mono); font-size: 11px; color: var(--amber); }
-  .event-severity {
-    font-family: var(--mono);
-    font-size: 9px;
-    letter-spacing: 2px;
-    padding: 2px 6px;
-    display: inline-block;
-    width: fit-content;
-  }
-  .event-severity.critical { background: rgba(255,34,51,0.15); color: var(--red); border: 1px solid var(--red2); }
-  .event-severity.major { background: rgba(255,176,0,0.1); color: var(--amber); border: 1px solid var(--amber2); }
-  .event-severity.info { background: rgba(90,96,128,0.2); color: var(--dim); border: 1px solid var(--border); }
+    /* ─── MAIN LAYOUT ─── */
+    .main {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      grid-template-rows: auto auto auto;
+      gap: 12px;
+      padding: 12px;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
 
-  .event-body {}
-  .event-headline { font-family: var(--body); font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 4px; line-height: 1.3; }
-  .event-detail { font-size: 13px; color: var(--text); line-height: 1.4; }
-  .event-source { font-family: var(--mono); font-size: 10px; color: var(--dim); margin-top: 4px; }
-  .event-source a { color: var(--blue); text-decoration: none; }
-  .event-source a:hover { color: var(--cyan); }
+    /* ─── PANELS ─── */
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
 
-  /* ─── SOURCES PANEL ─── */
-  .sources-panel { grid-column: 2; }
-  .source-link {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border);
-    text-decoration: none;
-    transition: background 0.2s;
-  }
-  .source-link:hover { background: var(--panel2); }
-  .source-name { font-family: var(--body); font-size: 14px; font-weight: 600; color: #fff; }
-  .source-type { font-family: var(--mono); font-size: 10px; color: var(--dim); margin-top: 2px; }
-  .source-status {
-    font-family: var(--mono);
-    font-size: 9px;
-    padding: 3px 8px;
-    letter-spacing: 1px;
-  }
-  .source-status.live { background: rgba(255,34,51,0.15); color: var(--red); border: 1px solid var(--red2); }
-  .source-status.active { background: rgba(0,255,136,0.1); color: var(--green); border: 1px solid rgba(0,255,136,0.3); }
+    .panel::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--red2), var(--amber), transparent);
+    }
 
-  /* ─── AI UPDATE PANEL ─── */
-  .ai-panel {
-    grid-column: 1 / -1;
-  }
-  .ai-content {
-    padding: 16px;
-    font-family: var(--body);
-    font-size: 15px;
-    line-height: 1.7;
-    color: var(--text);
-    max-height: 360px;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--amber2) var(--bg);
-  }
-  .ai-content p { margin-bottom: 12px; }
-  .ai-loading {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 20px;
-    font-family: var(--mono);
-    font-size: 13px;
-    color: var(--dim);
-  }
-  .spinner {
-    width: 18px; height: 18px;
-    border: 2px solid var(--border);
-    border-top-color: var(--amber);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    flex-shrink: 0;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
+    .panel-header {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-  /* ─── REFRESH BAR ─── */
-  .refresh-bar {
-    height: 3px;
-    background: var(--border);
-    margin: 0;
-    overflow: hidden;
-  }
-  .refresh-progress {
-    height: 100%;
-    background: linear-gradient(90deg, var(--red2), var(--amber));
-    width: 100%;
-    transform-origin: left;
-    transition: transform linear;
-  }
+    .panel-title {
+      font-family: var(--display);
+      font-size: 15px;
+      /* Increased from 13px */
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--amber);
+    }
 
-  /* ─── BOTTOM STATUS ─── */
-  .status-bar {
-    background: var(--panel);
-    border-top: 1px solid var(--border);
-    padding: 8px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--dim);
-  }
-  .status-bar span { margin-right: 20px; }
-  .status-ok { color: var(--green); }
+    .panel-badge {
+      font-family: var(--mono);
+      font-size: 12px;
+      /* Increased from 10px */
+      color: var(--dim);
+      letter-spacing: 1px;
+    }
 
-  /* ─── MAP PANEL ─── */
-  .map-panel { grid-column: 1 / -1; }
-  .conflict-map {
-    padding: 16px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 8px;
-  }
-  .region-card {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    padding: 12px;
-    position: relative;
-  }
-  .region-name { font-family: var(--display); font-size: 14px; font-weight: 600; color: #fff; letter-spacing: 2px; margin-bottom: 6px; }
-  .region-status { font-family: var(--mono); font-size: 10px; letter-spacing: 1px; }
-  .region-status.active-conflict { color: var(--red); }
-  .region-status.strikes { color: var(--amber); }
-  .region-status.escalation { color: #ff8800; }
-  .region-status.monitoring { color: var(--dim); }
-  .region-dot {
-    display: inline-block; width: 6px; height: 6px; border-radius: 50%;
-    margin-right: 5px; vertical-align: middle;
-  }
-  .red-dot { background: var(--red); box-shadow: 0 0 6px var(--red); animation: blink 0.8s ease-in-out infinite; }
-  .amber-dot { background: var(--amber); }
-  .dim-dot { background: var(--dim); }
+    /* ─── CASUALTY GRID ─── */
+    .casualty-grid {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 2px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
 
-  /* Manual refresh btn */
-  .refresh-btn {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--amber);
-    font-family: var(--mono);
-    font-size: 10px;
-    padding: 4px 10px;
-    cursor: pointer;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    transition: all 0.2s;
-  }
-  .refresh-btn:hover { border-color: var(--amber); background: rgba(255,176,0,0.08); }
+    .nation-card {
+      background: var(--panel2);
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
 
-  /* ─── CHAT PANEL ─── */
-  .chat-panel {
-    grid-column: 2;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    min-height: 400px;
-  }
-  .chat-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 16px;
-    border-bottom: 1px solid var(--border);
-  }
-  .persona-select {
-    background: var(--bg);
-    color: var(--amber);
-    border: 1px solid var(--border);
-    font-family: var(--mono);
-    font-size: 11px;
-    padding: 4px;
-    text-transform: uppercase;
-    cursor: pointer;
-  }
-  .chat-history {
-    flex-grow: 1;
-    padding: 12px;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--blue) var(--bg);
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    font-family: var(--body);
-    font-size: 14px;
-    max-height: 350px;
-  }
-  .chat-msg {
-    padding: 8px 12px;
-    border-radius: 4px;
-    max-width: 90%;
-    background: var(--panel2);
-    border: 1px solid var(--border);
-  }
-  .chat-msg.user {
-    align-self: flex-end;
-    border-color: var(--blue);
-    background: rgba(0, 170, 255, 0.05);
-    color: #fff;
-  }
-  .chat-msg.ai {
-    align-self: flex-start;
-    color: var(--text);
-  }
-  .chat-msg.system {
-    align-self: center;
-    text-align: center;
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--dim);
-    max-width: 100%;
-    background: transparent;
-    border: none;
-  }
-  .chat-input-area {
-    display: flex;
-    padding: 8px;
-    border-top: 1px solid var(--border);
-    gap: 8px;
-  }
-  .chat-input {
-    flex-grow: 1;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    color: #fff;
-    padding: 8px 12px;
-    font-family: var(--body);
-    font-size: 14px;
-    border-radius: 2px;
-  }
-  .chat-input:focus {
-    outline: none;
-    border-color: var(--blue);
-  }
-  .chat-send {
-    background: rgba(0, 170, 255, 0.1);
-    border: 1px solid var(--blue);
-    color: var(--blue);
-    font-family: var(--mono);
-    font-size: 12px;
-    padding: 0 16px;
-    cursor: pointer;
-    border-radius: 2px;
-    transition: all 0.2s;
-  }
-  .chat-send:hover {
-    background: rgba(0, 170, 255, 0.2);
-    box-shadow: 0 0 10px rgba(0, 170, 255, 0.3);
-  }
-  .chat-typing {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--amber);
-    animation: blink 1s infinite alternate;
-  }
+    .nation-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+    }
 
-  /* ─── RESPONSIVE ─── */
-  @media (max-width: 1200px) {
-    .casualty-grid { grid-template-columns: repeat(3, 1fr); }
-  }
-  @media (max-width: 900px) {
-    .main { grid-template-columns: 1fr; }
-    .casualty-grid { grid-template-columns: repeat(2, 1fr); }
-    .sources-panel { grid-column: 1; }
-    .event-feed-panel { grid-column: 1; }
-    .chat-panel { grid-column: 1; }
-  }
-  @media (max-width: 500px) {
-    .casualty-grid { grid-template-columns: 1fr; }
-  }
-</style>
+    .nation-card.iran::after {
+      background: #009900;
+    }
+
+    .nation-card.israel::after {
+      background: #0038b8;
+    }
+
+    .nation-card.usa::after {
+      background: #b22234;
+    }
+
+    .nation-card.proxies::after {
+      background: #ffd700;
+    }
+
+    .nation-card.global::after {
+      background: var(--cyan);
+    }
+
+    .nation-flag {
+      font-size: 28px;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .nation-name {
+      font-family: var(--display);
+      font-size: 22px;
+      /* Increased from 18px */
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: #fff;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 10px;
+      /* Increased from 8px */
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }
+
+    .stat-label {
+      font-family: var(--mono);
+      font-size: 12px;
+      /* Increased from 10px */
+      color: var(--dim);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      font-family: var(--mono);
+      font-size: 28px;
+      /* Increased from 22px */
+      font-weight: bold;
+      line-height: 1;
+    }
+
+    .stat-value.red {
+      color: var(--red);
+      text-shadow: 0 0 12px rgba(255, 34, 51, 0.5);
+    }
+
+    .stat-value.amber {
+      color: var(--amber);
+      text-shadow: 0 0 12px rgba(255, 176, 0, 0.4);
+    }
+
+    .stat-value.green {
+      color: var(--green);
+      text-shadow: 0 0 12px rgba(0, 255, 136, 0.4);
+    }
+
+    .stat-value.blue {
+      color: var(--blue);
+    }
+
+    .sub-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      /* Increased from 6px */
+      margin-top: 12px;
+      /* Increased from 10px */
+    }
+
+    .sub-stat {
+      background: var(--bg);
+      padding: 8px 10px;
+      /* Increased padding */
+    }
+
+    .sub-stat-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--dim);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* 9px to 11px */
+    .sub-stat-val {
+      font-family: var(--mono);
+      font-size: 15px;
+      color: var(--text);
+    }
+
+    /* 13px to 15px */
+
+    /* ─── EVENT FEED ─── */
+    .event-feed-panel {
+      grid-column: 1;
+    }
+
+    .event-feed {
+      padding: 0;
+      max-height: 500px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--red2) var(--bg);
+    }
+
+    .event-item {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: 12px;
+      transition: background 0.2s;
+      opacity: 0;
+      animation: fadeIn 0.5s forwards;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateX(-8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .event-item:hover {
+      background: var(--panel2);
+    }
+
+    .event-item.critical {
+      border-left: 3px solid var(--red);
+    }
+
+    .event-item.major {
+      border-left: 3px solid var(--amber);
+    }
+
+    .event-item.info {
+      border-left: 3px solid var(--dim);
+    }
+
+    .event-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .event-time {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--amber);
+    }
+
+    /* 11px to 13px */
+    .event-severity {
+      font-family: var(--mono);
+      font-size: 11px;
+      /* 9px to 11px */
+      letter-spacing: 2px;
+      padding: 3px 8px;
+      display: inline-block;
+      width: fit-content;
+    }
+
+    .event-severity.critical {
+      background: rgba(255, 34, 51, 0.15);
+      color: var(--red);
+      border: 1px solid var(--red2);
+    }
+
+    .event-severity.major {
+      background: rgba(255, 176, 0, 0.1);
+      color: var(--amber);
+      border: 1px solid var(--amber2);
+    }
+
+    .event-severity.info {
+      background: rgba(90, 96, 128, 0.2);
+      color: var(--dim);
+      border: 1px solid var(--border);
+    }
+
+    .event-body {}
+
+    .event-headline {
+      font-family: var(--body);
+      font-size: 17px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+
+    /* 15px to 17px */
+    .event-detail {
+      font-size: 15px;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    /* 13px to 15px, better line height */
+    .event-source {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--dim);
+      margin-top: 6px;
+    }
+
+    /* 10px to 12px */
+    .event-source a {
+      color: var(--blue);
+      text-decoration: none;
+    }
+
+    .event-source a:hover {
+      color: var(--cyan);
+    }
+
+    /* ─── SOURCES PANEL ─── */
+    .sources-panel {
+      grid-column: 2;
+    }
+
+    .source-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+
+    .source-link:hover {
+      background: var(--panel2);
+    }
+
+    .source-name {
+      font-family: var(--body);
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    /* 14px to 16px */
+    .source-type {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--dim);
+      margin-top: 4px;
+    }
+
+    /* 10px to 12px */
+    .source-status {
+      font-family: var(--mono);
+      font-size: 11px;
+      /* 9px to 11px */
+      padding: 4px 10px;
+      letter-spacing: 1px;
+    }
+
+    .source-status.live {
+      background: rgba(255, 34, 51, 0.15);
+      color: var(--red);
+      border: 1px solid var(--red2);
+    }
+
+    .source-status.active {
+      background: rgba(0, 255, 136, 0.1);
+      color: var(--green);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+    }
+
+    /* ─── AI UPDATE PANEL ─── */
+    .ai-panel {
+      grid-column: 1 / -1;
+    }
+
+    .ai-content {
+      padding: 20px;
+      /* Increased from 16px */
+      font-family: var(--body);
+      font-size: 17px;
+      /* Increased from 15px */
+      line-height: 1.8;
+      /* Increased from 1.7 */
+      color: var(--text);
+      max-height: 400px;
+      /* Increased from 360px */
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--amber2) var(--bg);
+    }
+
+    .ai-content p {
+      margin-bottom: 16px;
+      font-weight: 400;
+    }
+
+    .ai-loading {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 20px;
+      font-family: var(--mono);
+      font-size: 15px;
+      /* Increased from 13px */
+      color: var(--dim);
+    }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--border);
+      border-top-color: var(--amber);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* ─── REFRESH BAR ─── */
+    .refresh-bar {
+      height: 3px;
+      background: var(--border);
+      margin: 0;
+      overflow: hidden;
+    }
+
+    .refresh-progress {
+      height: 100%;
+      background: linear-gradient(90deg, var(--red2), var(--amber));
+      width: 100%;
+      transform-origin: left;
+      transition: transform linear;
+    }
+
+    /* ─── BOTTOM STATUS ─── */
+    .status-bar {
+      background: var(--panel);
+      border-top: 1px solid var(--border);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--mono);
+      font-size: 13px;
+      /* Increased from 11px */
+      color: var(--dim);
+    }
+
+    .status-bar span {
+      margin-right: 20px;
+    }
+
+    .status-ok {
+      color: var(--green);
+    }
+
+    /* ─── MAP PANEL ─── */
+    .map-panel {
+      grid-column: 1 / -1;
+    }
+
+    .conflict-map {
+      padding: 16px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 8px;
+    }
+
+    .region-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 16px;
+      /* Increased from 12px */
+      position: relative;
+    }
+
+    .region-name {
+      font-family: var(--display);
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+
+    /* 14px to 16px */
+    .region-status {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 1px;
+    }
+
+    /* 10px to 12px */
+    .region-status.active-conflict {
+      color: var(--red);
+    }
+
+    .region-status.strikes {
+      color: var(--amber);
+    }
+
+    .region-status.escalation {
+      color: #ff8800;
+    }
+
+    .region-status.monitoring {
+      color: var(--dim);
+    }
+
+    .region-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      /* 6px to 8px */
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+
+    .red-dot {
+      background: var(--red);
+      box-shadow: 0 0 6px var(--red);
+      animation: blink 0.8s ease-in-out infinite;
+    }
+
+    .amber-dot {
+      background: var(--amber);
+    }
+
+    .dim-dot {
+      background: var(--dim);
+    }
+
+    /* Manual refresh btn */
+    .refresh-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--amber);
+      font-family: var(--mono);
+      font-size: 12px;
+      /* Increased from 10px */
+      padding: 6px 12px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+
+    .refresh-btn:hover {
+      border-color: var(--amber);
+      background: rgba(255, 176, 0, 0.08);
+    }
+
+    /* ─── CHAT PANEL ─── */
+    .chat-panel {
+      grid-column: 2;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: 400px;
+    }
+
+    .chat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .persona-select {
+      background: var(--bg);
+      color: var(--amber);
+      border: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 13px;
+      /* 11px to 13px */
+      padding: 6px;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .chat-history {
+      flex-grow: 1;
+      padding: 16px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--blue) var(--bg);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      font-family: var(--body);
+      font-size: 16px;
+      /* 14px to 16px */
+      line-height: 1.5;
+      max-height: 350px;
+    }
+
+    .chat-msg {
+      padding: 10px 14px;
+      border-radius: 4px;
+      max-width: 90%;
+      background: var(--panel2);
+      border: 1px solid var(--border);
+    }
+
+    .chat-msg.user {
+      align-self: flex-end;
+      border-color: var(--blue);
+      background: rgba(0, 170, 255, 0.05);
+      color: #fff;
+    }
+
+    .chat-msg.ai {
+      align-self: flex-start;
+      color: var(--text);
+    }
+
+    .chat-msg.system {
+      align-self: center;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 12px;
+      /* 10px to 12px */
+      color: var(--dim);
+      line-height: 1.4;
+      max-width: 100%;
+      background: transparent;
+      border: none;
+    }
+
+    .chat-input-area {
+      display: flex;
+      padding: 8px;
+      border-top: 1px solid var(--border);
+      gap: 8px;
+    }
+
+    .chat-input {
+      flex-grow: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 10px 14px;
+      font-family: var(--body);
+      font-size: 16px;
+      /* 14px to 16px */
+      border-radius: 2px;
+    }
+
+    .chat-input:focus {
+      outline: none;
+      border-color: var(--blue);
+    }
+
+    .chat-send {
+      background: rgba(0, 170, 255, 0.1);
+      border: 1px solid var(--blue);
+      color: var(--blue);
+      font-family: var(--mono);
+      font-size: 14px;
+      /* 12px to 14px */
+      padding: 0 18px;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: all 0.2s;
+    }
+
+    .chat-send:hover {
+      background: rgba(0, 170, 255, 0.2);
+      box-shadow: 0 0 10px rgba(0, 170, 255, 0.3);
+    }
+
+    .chat-typing {
+      font-family: var(--mono);
+      font-size: 12px;
+      /* 10px to 12px */
+      color: var(--amber);
+      animation: blink 1s infinite alternate;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 1200px) {
+      .casualty-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 900px) {
+      .main {
+        grid-template-columns: 1fr;
+      }
+
+      .casualty-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .sources-panel {
+        grid-column: 1;
+      }
+
+      .event-feed-panel {
+        grid-column: 1;
+      }
+
+      .chat-panel {
+        grid-column: 1;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .casualty-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- HEADER -->
-<header>
-  <div class="header-left">
-    <div class="alert-badge">⚠ WARTIME ALERT</div>
-    <div class="header-title"><span>IRAN</span> CONFLICT — LIVE COMMAND CENTER</div>
+  <!-- HEADER -->
+  <header>
+    <div class="header-left">
+      <div class="alert-badge">⚠ WARTIME ALERT</div>
+      <div class="header-title"><span>IRAN</span> CONFLICT — LIVE COMMAND CENTER</div>
+    </div>
+    <div class="header-right">
+      <div><span class="live-dot"></span>LIVE</div>
+      <div id="clock">--:--:-- UTC</div>
+      <div>AUTO-REFRESH: <span id="countdown" class="status-ok">5:00</span></div>
+      <button class="refresh-btn" onclick="triggerRefresh()">↻ REFRESH NOW</button>
+    </div>
+  </header>
+
+  <!-- REFRESH PROGRESS BAR -->
+  <div class="refresh-bar">
+    <div class="refresh-progress" id="refreshBar"></div>
   </div>
-  <div class="header-right">
-    <div><span class="live-dot"></span>LIVE</div>
-    <div id="clock">--:--:-- UTC</div>
-    <div>AUTO-REFRESH: <span id="countdown" class="status-ok">5:00</span></div>
-    <button class="refresh-btn" onclick="triggerRefresh()">↻ REFRESH NOW</button>
-  </div>
-</header>
 
-<!-- REFRESH PROGRESS BAR -->
-<div class="refresh-bar"><div class="refresh-progress" id="refreshBar"></div></div>
-
-<!-- TICKER -->
-<div class="ticker-bar">
-  <div class="ticker-track" id="tickerTrack">
-    <span class="ticker-item">US & ISRAEL LAUNCH MAJOR COMBAT OPERATIONS AGAINST IRAN — FEB 28 2026</span>
-    <span class="ticker-item">TRUMP CLAIMS KHAMENEI KILLED — IRAN DENIES</span>
-    <span class="ticker-item">IRAN RETALIATES: STRIKES ON QATAR, UAE, KUWAIT, BAHRAIN, SAUDI ARABIA, IRAQ</span>
-    <span class="ticker-item">STRAIT OF HORMUZ CLOSURE REPORTED — OIL MARKETS IN FREEFALL</span>
-    <span class="ticker-item">EXPLOSIONS REPORTED IN TEHRAN, ISFAHAN, TABRIZ</span>
-    <span class="ticker-item">KATAIB HEZBOLLAH WARNS OF IMMINENT ATTACKS ON US BASES</span>
-    <span class="ticker-item">AIRSPACE CLOSED: QATAR, KUWAIT, BAHRAIN, UAE</span>
-    <span class="ticker-item">US FIFTH FLEET HQ IN BAHRAIN HIT — CASUALTIES REPORTED</span>
-  </div>
-</div>
-
-<!-- MAIN DASHBOARD -->
-<div class="main">
-
-  <!-- CASUALTY TRACKER -->
-  <div class="casualty-grid">
-    <div class="nation-card iran">
-      <span class="nation-flag">🇮🇷</span>
-      <div class="nation-name">Iran</div>
-      <div class="stat-row">
-        <span class="stat-label">CONFIRMED KILLED</span>
-        <span class="stat-value red" id="iran-dead">—</span>
-      </div>
-      <div class="stat-row">
-        <span class="stat-label">INJURED</span>
-        <span class="stat-value amber" id="iran-injured">—</span>
-      </div>
-      <div class="sub-stats">
-        <div class="sub-stat">
-          <div class="sub-stat-label">Military</div>
-          <div class="sub-stat-val" id="iran-mil">—</div>
-        </div>
-        <div class="sub-stat">
-          <div class="sub-stat-label">Civilian</div>
-          <div class="sub-stat-val" id="iran-civ">—</div>
-        </div>
-        <div class="sub-stat">
-          <div class="sub-stat-label">Leadership</div>
-          <div class="sub-stat-val" id="iran-lead">Disputed</div>
-        </div>
-        <div class="sub-stat">
-          <div class="sub-stat-label">Sites Hit</div>
-          <div class="sub-stat-val" id="iran-sites">—</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="nation-card israel">
-      <span class="nation-flag">🇮🇱</span>
-      <div class="nation-name">Israel</div>
-      <div class="stat-row">
-        <span class="stat-label">CONFIRMED KILLED</span>
-        <span class="stat-value red" id="israel-dead">—</span>
-      </div>
-      <div class="stat-row">
-        <span class="stat-label">INJURED</span>
-        <span class="stat-value amber" id="israel-injured">—</span>
-      </div>
-      <div class="sub-stats">
-        <div class="sub-stat">
-          <div class="sub-stat-label">Military</div>
-          <div class="sub-stat-val" id="israel-mil">—</div>
-        </div>
-        <div class="sub-stat">
-          <div class="sub-stat-label">Civilian</div>
-          <div class="sub-stat-val" id="israel-civ">—</div>
-        </div>
-        <div class="sub-stat">
-          <div class="sub-stat-label">Intercepted</div>
-          <div class="sub-stat-val" id="israel-intercepted">—</div>
-        </div>
-        <div class="sub-stat">
-          <div class="sub-stat-label">Missiles Fired</div>
-          <div class="sub-stat-val" id="israel-missiles">—</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="nation-card usa">
-      <span class="nation-flag">🇺🇸</span>
-      <div class="nation-name">United States</div>
-      <div class="stat-row">
-        <span class="stat-label">CONFIRMED KILLED</span>
-        <span class="stat-value red" id="us-dead">—</span>
-      </div>
-      <div class="stat-row">
-        <span class="stat-label">INJURED</span>
-        <span class="stat-value amber" id="us-injured">—</span>
-      </div>
-      <div class="sub-stats">
-        <div class="sub-stat">
-          <div class="sub-stat-label">Military</div>
-          <div class="sub-stat-val" id="us-mil">—</div>
-        </div>
-        <div class="sub-stat">
-          <div class="sub-stat-label">Bases Hit</div>
-          <div class="sub-stat-val" id="us-bases">—</div>
-        </div>
-        <div class="sub-stat">
-          <div class="sub-stat-label">Assets Lost</div>
-          <div class="sub-stat-val" id="us-assets">—</div>
-        </div>
-        <div class="sub-stat">
-          <div class="sub-stat-label">Sorties</div>
-          <div class="sub-stat-val" id="us-sorties">—</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="nation-card proxies">
-      <span class="nation-flag">⚔️</span>
-      <div class="nation-name">Iran Proxies</div>
-      <div class="stat-row">
-        <span class="stat-label">ACTIVE FRONTS</span>
-        <span class="stat-value amber" id="proxy-fronts">—</span>
-      </div>
-      <div class="stat-row">
-        <span class="stat-label">ATTACKS LAUNCHED</span>
-        <span class="stat-value red" id="proxy-attacks">—</span>
-      </div>
-      <div class="sub-stats">
-        <div class="sub-stat">
-          <div class="sub-stat-label">Hezbollah</div>
-          <div class="sub-stat-val" id="proxy-hezbollah">Active</div>
-        </div>
-        <div class="sub-stat">
-          <div class="sub-stat-label">Houthis</div>
-          <div class="sub-stat-val" id="proxy-houthis">Active</div>
-        </div>
-        <div class="sub-stat">
-          <div class="sub-stat-label">Kataib HB</div>
-          <div class="sub-stat-val" id="proxy-kataib">Warned</div>
-        </div>
-        <div class="sub-stat">
-          <div class="sub-stat-label">Hamas</div>
-          <div class="sub-stat-val" id="proxy-hamas">—</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- GLOBAL IMPACT -->
-    <div class="nation-card global">
-      <span class="nation-flag">🌍</span>
-      <div class="nation-name">Global Impact</div>
-      <div class="stat-row">
-        <span class="stat-label">CRUDE OIL (BRENT)</span>
-        <span class="stat-value red" id="global-oil">—</span>
-      </div>
-      <div class="stat-row">
-        <span class="stat-label">HORMUZ STRAIT</span>
-        <span class="stat-value amber" id="global-hormuz" style="font-size:16px;">—</span>
-      </div>
-      <div class="sub-stats">
-        <div class="sub-stat">
-          <div class="sub-stat-label">Airspace</div>
-          <div class="sub-stat-val" id="global-airspace" style="font-size:10px;">—</div>
-        </div>
-        <div class="sub-stat">
-          <div class="sub-stat-label">UN Response</div>
-          <div class="sub-stat-val" id="global-un" style="font-size:10px;">—</div>
-        </div>
-      </div>
+  <!-- TICKER -->
+  <div class="ticker-bar">
+    <div class="ticker-track" id="tickerTrack">
+      <span class="ticker-item">US & ISRAEL LAUNCH MAJOR COMBAT OPERATIONS AGAINST IRAN — FEB 28 2026</span>
+      <span class="ticker-item">TRUMP CLAIMS KHAMENEI KILLED — IRAN DENIES</span>
+      <span class="ticker-item">IRAN RETALIATES: STRIKES ON QATAR, UAE, KUWAIT, BAHRAIN, SAUDI ARABIA, IRAQ</span>
+      <span class="ticker-item">STRAIT OF HORMUZ CLOSURE REPORTED — OIL MARKETS IN FREEFALL</span>
+      <span class="ticker-item">EXPLOSIONS REPORTED IN TEHRAN, ISFAHAN, TABRIZ</span>
+      <span class="ticker-item">KATAIB HEZBOLLAH WARNS OF IMMINENT ATTACKS ON US BASES</span>
+      <span class="ticker-item">AIRSPACE CLOSED: QATAR, KUWAIT, BAHRAIN, UAE</span>
+      <span class="ticker-item">US FIFTH FLEET HQ IN BAHRAIN HIT — CASUALTIES REPORTED</span>
     </div>
   </div>
 
-  <!-- REGION STATUS MAP -->
-  <div class="panel map-panel">
-    <div class="panel-header">
-      <span class="panel-title">REGIONAL CONFLICT STATUS</span>
-      <span class="panel-badge">LIVE THEATRE</span>
+  <!-- MAIN DASHBOARD -->
+  <div class="main">
+
+    <!-- CASUALTY TRACKER -->
+    <div class="casualty-grid">
+      <div class="nation-card iran">
+        <span class="nation-flag">🇮🇷</span>
+        <div class="nation-name">Iran</div>
+        <div class="stat-row">
+          <span class="stat-label">CONFIRMED KILLED</span>
+          <span class="stat-value red" id="iran-dead">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">INJURED</span>
+          <span class="stat-value amber" id="iran-injured">—</span>
+        </div>
+        <div class="sub-stats">
+          <div class="sub-stat">
+            <div class="sub-stat-label">Military</div>
+            <div class="sub-stat-val" id="iran-mil">—</div>
+          </div>
+          <div class="sub-stat">
+            <div class="sub-stat-label">Civilian</div>
+            <div class="sub-stat-val" id="iran-civ">—</div>
+          </div>
+          <div class="sub-stat">
+            <div class="sub-stat-label">Leadership</div>
+            <div class="sub-stat-val" id="iran-lead">Disputed</div>
+          </div>
+          <div class="sub-stat">
+            <div class="sub-stat-label">Sites Hit</div>
+            <div class="sub-stat-val" id="iran-sites">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="nation-card israel">
+        <span class="nation-flag">🇮🇱</span>
+        <div class="nation-name">Israel</div>
+        <div class="stat-row">
+          <span class="stat-label">CONFIRMED KILLED</span>
+          <span class="stat-value red" id="israel-dead">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">INJURED</span>
+          <span class="stat-value amber" id="israel-injured">—</span>
+        </div>
+        <div class="sub-stats">
+          <div class="sub-stat">
+            <div class="sub-stat-label">Military</div>
+            <div class="sub-stat-val" id="israel-mil">—</div>
+          </div>
+          <div class="sub-stat">
+            <div class="sub-stat-label">Civilian</div>
+            <div class="sub-stat-val" id="israel-civ">—</div>
+          </div>
+          <div class="sub-stat">
+            <div class="sub-stat-label">Intercepted</div>
+            <div class="sub-stat-val" id="israel-intercepted">—</div>
+          </div>
+          <div class="sub-stat">
+            <div class="sub-stat-label">Missiles Fired</div>
+            <div class="sub-stat-val" id="israel-missiles">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="nation-card usa">
+        <span class="nation-flag">🇺🇸</span>
+        <div class="nation-name">United States</div>
+        <div class="stat-row">
+          <span class="stat-label">CONFIRMED KILLED</span>
+          <span class="stat-value red" id="us-dead">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">INJURED</span>
+          <span class="stat-value amber" id="us-injured">—</span>
+        </div>
+        <div class="sub-stats">
+          <div class="sub-stat">
+            <div class="sub-stat-label">Military</div>
+            <div class="sub-stat-val" id="us-mil">—</div>
+          </div>
+          <div class="sub-stat">
+            <div class="sub-stat-label">Bases Hit</div>
+            <div class="sub-stat-val" id="us-bases">—</div>
+          </div>
+          <div class="sub-stat">
+            <div class="sub-stat-label">Assets Lost</div>
+            <div class="sub-stat-val" id="us-assets">—</div>
+          </div>
+          <div class="sub-stat">
+            <div class="sub-stat-label">Sorties</div>
+            <div class="sub-stat-val" id="us-sorties">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="nation-card proxies">
+        <span class="nation-flag">⚔️</span>
+        <div class="nation-name">Iran Proxies</div>
+        <div class="stat-row">
+          <span class="stat-label">ACTIVE FRONTS</span>
+          <span class="stat-value amber" id="proxy-fronts">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">ATTACKS LAUNCHED</span>
+          <span class="stat-value red" id="proxy-attacks">—</span>
+        </div>
+        <div class="sub-stats">
+          <div class="sub-stat">
+            <div class="sub-stat-label">Hezbollah</div>
+            <div class="sub-stat-val" id="proxy-hezbollah">Active</div>
+          </div>
+          <div class="sub-stat">
+            <div class="sub-stat-label">Houthis</div>
+            <div class="sub-stat-val" id="proxy-houthis">Active</div>
+          </div>
+          <div class="sub-stat">
+            <div class="sub-stat-label">Kataib HB</div>
+            <div class="sub-stat-val" id="proxy-kataib">Warned</div>
+          </div>
+          <div class="sub-stat">
+            <div class="sub-stat-label">Hamas</div>
+            <div class="sub-stat-val" id="proxy-hamas">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GLOBAL IMPACT -->
+      <div class="nation-card global">
+        <span class="nation-flag">🌍</span>
+        <div class="nation-name">Global Impact</div>
+        <div class="stat-row">
+          <span class="stat-label">CRUDE OIL (BRENT)</span>
+          <span class="stat-value red" id="global-oil">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">HORMUZ STRAIT</span>
+          <span class="stat-value amber" id="global-hormuz" style="font-size:20px;">—</span>
+        </div>
+        <div class="sub-stats">
+          <div class="sub-stat">
+            <div class="sub-stat-label">Airspace</div>
+            <div class="sub-stat-val" id="global-airspace" style="font-size:12px;">—</div>
+          </div>
+          <div class="sub-stat">
+            <div class="sub-stat-label">UN Response</div>
+            <div class="sub-stat-val" id="global-un" style="font-size:12px;">—</div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="conflict-map">
-      <div class="region-card">
-        <div class="region-name">TEHRAN</div>
-        <div class="region-status active-conflict"><span class="region-dot red-dot"></span>UNDER ATTACK</div>
+
+    <!-- REGION STATUS MAP -->
+    <div class="panel map-panel">
+      <div class="panel-header">
+        <span class="panel-title">REGIONAL CONFLICT STATUS</span>
+        <span class="panel-badge">LIVE THEATRE</span>
       </div>
-      <div class="region-card">
-        <div class="region-name">ISFAHAN</div>
-        <div class="region-status active-conflict"><span class="region-dot red-dot"></span>STRIKES REPORTED</div>
+      <div class="conflict-map">
+        <div class="region-card">
+          <div class="region-name">TEHRAN</div>
+          <div class="region-status active-conflict"><span class="region-dot red-dot"></span>UNDER ATTACK</div>
+        </div>
+        <div class="region-card">
+          <div class="region-name">ISFAHAN</div>
+          <div class="region-status active-conflict"><span class="region-dot red-dot"></span>STRIKES REPORTED</div>
+        </div>
+        <div class="region-card">
+          <div class="region-name">STRAIT OF HORMUZ</div>
+          <div class="region-status active-conflict"><span class="region-dot red-dot"></span>CLOSED</div>
+        </div>
+        <div class="region-card">
+          <div class="region-name">BAHRAIN</div>
+          <div class="region-status strikes"><span class="region-dot amber-dot"></span>IRANIAN STRIKES</div>
+        </div>
+        <div class="region-card">
+          <div class="region-name">QATAR</div>
+          <div class="region-status strikes"><span class="region-dot amber-dot"></span>AIRBASE TARGETED</div>
+        </div>
+        <div class="region-card">
+          <div class="region-name">UAE</div>
+          <div class="region-status strikes"><span class="region-dot amber-dot"></span>TARGETED</div>
+        </div>
+        <div class="region-card">
+          <div class="region-name">KUWAIT</div>
+          <div class="region-status strikes"><span class="region-dot amber-dot"></span>TARGETED</div>
+        </div>
+        <div class="region-card">
+          <div class="region-name">SAUDI ARABIA</div>
+          <div class="region-status escalation"><span class="region-dot red-dot"></span>ATTACKS REPELLED</div>
+        </div>
+        <div class="region-card">
+          <div class="region-name">IRAQ</div>
+          <div class="region-status escalation"><span class="region-dot red-dot"></span>ESCALATING</div>
+        </div>
+        <div class="region-card">
+          <div class="region-name">ISRAEL</div>
+          <div class="region-status active-conflict"><span class="region-dot red-dot"></span>UNDER FIRE</div>
+        </div>
+        <div class="region-card">
+          <div class="region-name">JORDAN</div>
+          <div class="region-status strikes"><span class="region-dot amber-dot"></span>TARGETED</div>
+        </div>
+        <div class="region-card">
+          <div class="region-name">SYRIA</div>
+          <div class="region-status escalation"><span class="region-dot amber-dot"></span>ESCALATING</div>
+        </div>
+        <div class="region-card">
+          <div class="region-name">LEBANON</div>
+          <div class="region-status monitoring"><span class="region-dot dim-dot"></span>MONITORING</div>
+        </div>
+        <div class="region-card">
+          <div class="region-name">OMAN</div>
+          <div class="region-status monitoring"><span class="region-dot dim-dot"></span>NOT TARGETED</div>
+        </div>
       </div>
-      <div class="region-card">
-        <div class="region-name">STRAIT OF HORMUZ</div>
-        <div class="region-status active-conflict"><span class="region-dot red-dot"></span>CLOSED</div>
+    </div>
+
+    <!-- AI INTELLIGENCE BRIEFING -->
+    <div class="panel ai-panel">
+      <div class="panel-header">
+        <span class="panel-title">🤖 AI INTELLIGENCE BRIEFING</span>
+        <span class="panel-badge">UPDATED VIA AI SEARCH — AUTO-REFRESH 5MIN</span>
       </div>
-      <div class="region-card">
-        <div class="region-name">BAHRAIN</div>
-        <div class="region-status strikes"><span class="region-dot amber-dot"></span>IRANIAN STRIKES</div>
+      <div class="ai-content" id="aiContent">
+        <div class="ai-loading">
+          <div class="spinner"></div>
+          <span>INITIALIZING INTELLIGENCE FEED — FETCHING LATEST REPORTS...</span>
+        </div>
       </div>
-      <div class="region-card">
-        <div class="region-name">QATAR</div>
-        <div class="region-status strikes"><span class="region-dot amber-dot"></span>AIRBASE TARGETED</div>
+    </div>
+
+    <!-- EVENT FEED -->
+    <div class="panel event-feed-panel">
+      <div class="panel-header">
+        <span class="panel-title">📡 LIVE EVENT FEED</span>
+        <span class="panel-badge" id="eventCount">0 EVENTS</span>
       </div>
-      <div class="region-card">
-        <div class="region-name">UAE</div>
-        <div class="region-status strikes"><span class="region-dot amber-dot"></span>TARGETED</div>
+      <div class="event-feed" id="eventFeed"></div>
+    </div>
+
+    <!-- CHAT BOT PANEL -->
+    <div class="panel chat-panel">
+      <div class="chat-header">
+        <span class="panel-title">🤖 DIRECT INTEL CHAT</span>
+        <select id="chatPersona" class="persona-select">
+          <option value="neutral">Neutral AI</option>
+          <option value="trump">Donald Trump</option>
+          <option value="khamenei">Ayatollah Khamenei</option>
+        </select>
       </div>
-      <div class="region-card">
-        <div class="region-name">KUWAIT</div>
-        <div class="region-status strikes"><span class="region-dot amber-dot"></span>TARGETED</div>
+      <div class="chat-history" id="chatHistory">
+        <div class="chat-msg system">SYSTEM ONLINE. SELECT PERSONA AND INQUIRE ABOUT CURRENT THEATRE OF OPERATIONS.
+        </div>
       </div>
-      <div class="region-card">
-        <div class="region-name">SAUDI ARABIA</div>
-        <div class="region-status escalation"><span class="region-dot red-dot"></span>ATTACKS REPELLED</div>
+      <div class="chat-input-area">
+        <input type="text" id="chatInput" class="chat-input" placeholder="Ask about the war..." autocomplete="off">
+        <button class="chat-send" onclick="sendChatMessage()">SEND</button>
       </div>
-      <div class="region-card">
-        <div class="region-name">IRAQ</div>
-        <div class="region-status escalation"><span class="region-dot red-dot"></span>ESCALATING</div>
+    </div>
+
+    <!-- SOURCES PANEL -->
+    <div class="panel sources-panel">
+      <div class="panel-header">
+        <span class="panel-title">📰 LIVE SOURCES</span>
+        <span class="panel-badge">PRIMARY FEEDS</span>
       </div>
-      <div class="region-card">
-        <div class="region-name">ISRAEL</div>
-        <div class="region-status active-conflict"><span class="region-dot red-dot"></span>UNDER FIRE</div>
+      <div id="sourcesList">
+        <a class="source-link"
+          href="https://www.aljazeera.com/news/liveblog/2026/2/28/live-israel-launches-attacks-on-iran-multiple-explosions-heard-in-tehran"
+          target="_blank">
+          <div>
+            <div class="source-name">Al Jazeera</div>
+            <div class="source-type">LIVE BLOG — MIDDLE EAST BUREAU</div>
+          </div>
+          <div class="source-status live">LIVE</div>
+        </a>
+        <a class="source-link"
+          href="https://www.reuters.com/world/iran-crisis-live-explosions-tehran-israel-announces-strike-2026-02-28/"
+          target="_blank">
+          <div>
+            <div class="source-name">Reuters</div>
+            <div class="source-type">LIVE WIRE — GLOBAL BUREAU</div>
+          </div>
+          <div class="source-status live">LIVE</div>
+        </a>
+        <a class="source-link" href="https://edition.cnn.com/world/live-news/israel-iran-attack-02-28-26-hnk-intl"
+          target="_blank">
+          <div>
+            <div class="source-name">CNN World</div>
+            <div class="source-type">LIVE UPDATES — US NETWORK</div>
+          </div>
+          <div class="source-status live">LIVE</div>
+        </a>
+        <a class="source-link" href="https://apnews.com/live/live-updates-israel-iran-february-28-2026" target="_blank">
+          <div>
+            <div class="source-name">AP News</div>
+            <div class="source-type">LIVE WIRE — WIRE SERVICE</div>
+          </div>
+          <div class="source-status live">LIVE</div>
+        </a>
+        <a class="source-link" href="https://www.nytimes.com/live/2026/02/28/world/iran-strikes-trump" target="_blank">
+          <div>
+            <div class="source-name">New York Times</div>
+            <div class="source-type">LIVE BLOG — INTL DESK</div>
+          </div>
+          <div class="source-status live">LIVE</div>
+        </a>
+        <a class="source-link" href="https://www.bbc.com/news/live/c7x3xxyvy5o" target="_blank">
+          <div>
+            <div class="source-name">BBC News</div>
+            <div class="source-type">LIVE COVERAGE — WORLD SERVICE</div>
+          </div>
+          <div class="source-status live">LIVE</div>
+        </a>
+        <a class="source-link" href="https://www.theguardian.com/world/iran" target="_blank">
+          <div>
+            <div class="source-name">The Guardian</div>
+            <div class="source-type">LIVE BLOG — MIDDLE EAST</div>
+          </div>
+          <div class="source-status live">LIVE</div>
+        </a>
+        <a class="source-link" href="https://www.timesofisrael.com" target="_blank">
+          <div>
+            <div class="source-name">Times of Israel</div>
+            <div class="source-type">LIVE UPDATES — ISRAEL</div>
+          </div>
+          <div class="source-status live">LIVE</div>
+        </a>
+        <a class="source-link" href="https://www.haaretz.com" target="_blank">
+          <div>
+            <div class="source-name">Haaretz</div>
+            <div class="source-type">LIVE BLOG — ISRAEL</div>
+          </div>
+          <div class="source-status active">ACTIVE</div>
+        </a>
+        <a class="source-link" href="https://www.presstv.ir" target="_blank">
+          <div>
+            <div class="source-name">Press TV / Tasnim</div>
+            <div class="source-type">STATE MEDIA — IRAN</div>
+          </div>
+          <div class="source-status active">ACTIVE</div>
+        </a>
+        <a class="source-link" href="https://english.alarabiya.net" target="_blank">
+          <div>
+            <div class="source-name">Al Arabiya</div>
+            <div class="source-type">LIVE — GULF REGION</div>
+          </div>
+          <div class="source-status live">LIVE</div>
+        </a>
+        <a class="source-link" href="https://www.axios.com/news/national-security" target="_blank">
+          <div>
+            <div class="source-name">Axios / Defense One</div>
+            <div class="source-type">NATIONAL SECURITY DESK</div>
+          </div>
+          <div class="source-status active">ACTIVE</div>
+        </a>
       </div>
-      <div class="region-card">
-        <div class="region-name">JORDAN</div>
-        <div class="region-status strikes"><span class="region-dot amber-dot"></span>TARGETED</div>
-      </div>
-      <div class="region-card">
-        <div class="region-name">SYRIA</div>
-        <div class="region-status escalation"><span class="region-dot amber-dot"></span>ESCALATING</div>
-      </div>
-      <div class="region-card">
-        <div class="region-name">LEBANON</div>
-        <div class="region-status monitoring"><span class="region-dot dim-dot"></span>MONITORING</div>
-      </div>
-      <div class="region-card">
-        <div class="region-name">OMAN</div>
-        <div class="region-status monitoring"><span class="region-dot dim-dot"></span>NOT TARGETED</div>
-      </div>
+    </div>
+
+  </div>
+
+  <!-- STATUS BAR -->
+  <div class="status-bar">
+    <div>
+      <span>SYS: <span class="status-ok">ONLINE</span></span>
+      <span>AI FEED: <span class="status-ok" id="aiFeedStatus">CONNECTED</span></span>
+      <span>LAST UPDATE: <span id="lastUpdate">—</span></span>
+    </div>
+    <div>
+      <span style="color:var(--amber)">⚠ DISCLAIMER: AI-SUMMARIZED FROM OPEN SOURCES. VERIFY CASUALTY FIGURES WITH
+        OFFICIAL SOURCES. INFORMATION CHANGES RAPIDLY.</span>
     </div>
   </div>
 
-  <!-- AI INTELLIGENCE BRIEFING -->
-  <div class="panel ai-panel">
-    <div class="panel-header">
-      <span class="panel-title">🤖 AI INTELLIGENCE BRIEFING</span>
-      <span class="panel-badge">UPDATED VIA AI SEARCH — AUTO-REFRESH 5MIN</span>
-    </div>
-    <div class="ai-content" id="aiContent">
-      <div class="ai-loading">
-        <div class="spinner"></div>
-        <span>INITIALIZING INTELLIGENCE FEED — FETCHING LATEST REPORTS...</span>
-      </div>
-    </div>
-  </div>
+  <script>
+    // ─── CONFIG ───────────────────────────────────────────────────────────────────
+    const REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
+    let refreshTimer = null;
+    let countdownTimer = null;
+    let nextRefreshAt = Date.now() + REFRESH_INTERVAL;
+    let updateIndex = 0;
 
-  <!-- EVENT FEED -->
-  <div class="panel event-feed-panel">
-    <div class="panel-header">
-      <span class="panel-title">📡 LIVE EVENT FEED</span>
-      <span class="panel-badge" id="eventCount">0 EVENTS</span>
-    </div>
-    <div class="event-feed" id="eventFeed"></div>
-  </div>
+    // ─── CLOCK ────────────────────────────────────────────────────────────────────
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('clock').textContent =
+        now.toUTCString().split(' ').slice(4, 5)[0] + ' UTC';
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
 
-  <!-- CHAT BOT PANEL -->
-  <div class="panel chat-panel">
-    <div class="chat-header">
-      <span class="panel-title">🤖 DIRECT INTEL CHAT</span>
-      <select id="chatPersona" class="persona-select">
-        <option value="neutral">Neutral AI</option>
-        <option value="trump">Donald Trump</option>
-        <option value="khamenei">Ayatollah Khamenei</option>
-      </select>
-    </div>
-    <div class="chat-history" id="chatHistory">
-      <div class="chat-msg system">SYSTEM ONLINE. SELECT PERSONA AND INQUIRE ABOUT CURRENT THEATRE OF OPERATIONS.</div>
-    </div>
-    <div class="chat-input-area">
-      <input type="text" id="chatInput" class="chat-input" placeholder="Ask about the war..." autocomplete="off">
-      <button class="chat-send" onclick="sendChatMessage()">SEND</button>
-    </div>
-  </div>
+    // ─── COUNTDOWN ────────────────────────────────────────────────────────────────
+    function updateCountdown() {
+      const remaining = Math.max(0, nextRefreshAt - Date.now());
+      const mins = Math.floor(remaining / 60000);
+      const secs = Math.floor((remaining % 60000) / 1000);
+      document.getElementById('countdown').textContent =
+        `${mins}:${secs.toString().padStart(2, '0')}`;
 
-  <!-- SOURCES PANEL -->
-  <div class="panel sources-panel">
-    <div class="panel-header">
-      <span class="panel-title">📰 LIVE SOURCES</span>
-      <span class="panel-badge">PRIMARY FEEDS</span>
-    </div>
-    <div id="sourcesList">
-      <a class="source-link" href="https://www.aljazeera.com/news/liveblog/2026/2/28/live-israel-launches-attacks-on-iran-multiple-explosions-heard-in-tehran" target="_blank">
-        <div><div class="source-name">Al Jazeera</div><div class="source-type">LIVE BLOG — MIDDLE EAST BUREAU</div></div>
-        <div class="source-status live">LIVE</div>
-      </a>
-      <a class="source-link" href="https://www.reuters.com/world/iran-crisis-live-explosions-tehran-israel-announces-strike-2026-02-28/" target="_blank">
-        <div><div class="source-name">Reuters</div><div class="source-type">LIVE WIRE — GLOBAL BUREAU</div></div>
-        <div class="source-status live">LIVE</div>
-      </a>
-      <a class="source-link" href="https://edition.cnn.com/world/live-news/israel-iran-attack-02-28-26-hnk-intl" target="_blank">
-        <div><div class="source-name">CNN World</div><div class="source-type">LIVE UPDATES — US NETWORK</div></div>
-        <div class="source-status live">LIVE</div>
-      </a>
-      <a class="source-link" href="https://apnews.com/live/live-updates-israel-iran-february-28-2026" target="_blank">
-        <div><div class="source-name">AP News</div><div class="source-type">LIVE WIRE — WIRE SERVICE</div></div>
-        <div class="source-status live">LIVE</div>
-      </a>
-      <a class="source-link" href="https://www.nytimes.com/live/2026/02/28/world/iran-strikes-trump" target="_blank">
-        <div><div class="source-name">New York Times</div><div class="source-type">LIVE BLOG — INTL DESK</div></div>
-        <div class="source-status live">LIVE</div>
-      </a>
-      <a class="source-link" href="https://www.bbc.com/news/live/c7x3xxyvy5o" target="_blank">
-        <div><div class="source-name">BBC News</div><div class="source-type">LIVE COVERAGE — WORLD SERVICE</div></div>
-        <div class="source-status live">LIVE</div>
-      </a>
-      <a class="source-link" href="https://www.theguardian.com/world/iran" target="_blank">
-        <div><div class="source-name">The Guardian</div><div class="source-type">LIVE BLOG — MIDDLE EAST</div></div>
-        <div class="source-status live">LIVE</div>
-      </a>
-      <a class="source-link" href="https://www.timesofisrael.com" target="_blank">
-        <div><div class="source-name">Times of Israel</div><div class="source-type">LIVE UPDATES — ISRAEL</div></div>
-        <div class="source-status live">LIVE</div>
-      </a>
-      <a class="source-link" href="https://www.haaretz.com" target="_blank">
-        <div><div class="source-name">Haaretz</div><div class="source-type">LIVE BLOG — ISRAEL</div></div>
-        <div class="source-status active">ACTIVE</div>
-      </a>
-      <a class="source-link" href="https://www.presstv.ir" target="_blank">
-        <div><div class="source-name">Press TV / Tasnim</div><div class="source-type">STATE MEDIA — IRAN</div></div>
-        <div class="source-status active">ACTIVE</div>
-      </a>
-      <a class="source-link" href="https://english.alarabiya.net" target="_blank">
-        <div><div class="source-name">Al Arabiya</div><div class="source-type">LIVE — GULF REGION</div></div>
-        <div class="source-status live">LIVE</div>
-      </a>
-      <a class="source-link" href="https://www.axios.com/news/national-security" target="_blank">
-        <div><div class="source-name">Axios / Defense One</div><div class="source-type">NATIONAL SECURITY DESK</div></div>
-        <div class="source-status active">ACTIVE</div>
-      </a>
-    </div>
-  </div>
+      // Update progress bar
+      const pct = (REFRESH_INTERVAL - remaining) / REFRESH_INTERVAL;
+      document.getElementById('refreshBar').style.transform = `scaleX(${pct})`;
+    }
+    setInterval(updateCountdown, 500);
+    updateCountdown();
 
-</div>
+    // ─── AI BRIEFING VIA VERCEL BACKEND ────────────────────────────────────────────
+    let cachedBriefingText = "";
 
-<!-- STATUS BAR -->
-<div class="status-bar">
-  <div>
-    <span>SYS: <span class="status-ok">ONLINE</span></span>
-    <span>AI FEED: <span class="status-ok" id="aiFeedStatus">CONNECTED</span></span>
-    <span>LAST UPDATE: <span id="lastUpdate">—</span></span>
-  </div>
-  <div>
-    <span style="color:var(--amber)">⚠ DISCLAIMER: AI-SUMMARIZED FROM OPEN SOURCES. VERIFY CASUALTY FIGURES WITH OFFICIAL SOURCES. INFORMATION CHANGES RAPIDLY.</span>
-  </div>
-</div>
+    async function fetchAIBriefing() {
+      const el = document.getElementById('aiContent');
+      el.innerHTML = `<div class="ai-loading"><div class="spinner"></div><span>QUERYING AI INTELLIGENCE SYSTEMS — SEARCHING LIVE SOURCES...</span></div>`;
+      document.getElementById('aiFeedStatus').textContent = 'FETCHING...';
+      document.getElementById('aiFeedStatus').style.color = 'var(--amber)';
 
-<script>
-// ─── CONFIG ───────────────────────────────────────────────────────────────────
-const REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
-let refreshTimer = null;
-let countdownTimer = null;
-let nextRefreshAt = Date.now() + REFRESH_INTERVAL;
-let updateIndex = 0;
+      try {
+        const response = await fetch("/api/briefing", {
+          method: "POST"
+        });
 
-// ─── CLOCK ────────────────────────────────────────────────────────────────────
-function updateClock() {
-  const now = new Date();
-  document.getElementById('clock').textContent =
-    now.toUTCString().split(' ').slice(4,5)[0] + ' UTC';
-}
-setInterval(updateClock, 1000);
-updateClock();
+        if (!response.ok) throw new Error("API Route Failed");
+        const data = await response.json();
+        const fullText = data.text;
+        cachedBriefingText = fullText; // Cache for chat bot context
 
-// ─── COUNTDOWN ────────────────────────────────────────────────────────────────
-function updateCountdown() {
-  const remaining = Math.max(0, nextRefreshAt - Date.now());
-  const mins = Math.floor(remaining / 60000);
-  const secs = Math.floor((remaining % 60000) / 1000);
-  document.getElementById('countdown').textContent =
-    `${mins}:${secs.toString().padStart(2,'0')}`;
-  
-  // Update progress bar
-  const pct = (REFRESH_INTERVAL - remaining) / REFRESH_INTERVAL;
-  document.getElementById('refreshBar').style.transform = `scaleX(${pct})`;
-}
-setInterval(updateCountdown, 500);
-updateCountdown();
+        // Parse stats JSON
+        const statsMatch = fullText.match(/<STATS>([\s\S]*?)<\/STATS>/);
+        let stats = null;
+        if (statsMatch) {
+          try { stats = JSON.parse(statsMatch[1].trim()); } catch (e) { }
+        }
 
-// ─── AI BRIEFING VIA VERCEL BACKEND ────────────────────────────────────────────
-let cachedBriefingText = "";
+        // Update casualty cards
+        if (stats) {
+          updateStats(stats);
+          if (stats.events) updateEventFeed(stats.events);
+        }
 
-async function fetchAIBriefing() {
-  const el = document.getElementById('aiContent');
-  el.innerHTML = `<div class="ai-loading"><div class="spinner"></div><span>QUERYING AI INTELLIGENCE SYSTEMS — SEARCHING LIVE SOURCES...</span></div>`;
-  document.getElementById('aiFeedStatus').textContent = 'FETCHING...';
-  document.getElementById('aiFeedStatus').style.color = 'var(--amber)';
+        // Render briefing (strip STATS block)
+        const briefingText = fullText.replace(/<STATS>[\s\S]*?<\/STATS>/, '').trim();
+        const paragraphs = briefingText.split('\n').filter(p => p.trim()).map(p =>
+          `<p>${p.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>`
+        ).join('');
+        el.innerHTML = paragraphs || '<p style="color:var(--dim)">Briefing unavailable — check sources directly.</p>';
 
-  try {
-    const response = await fetch("/api/briefing", {
-      method: "POST"
-    });
+        document.getElementById('lastUpdate').textContent = new Date().toUTCString().split(' ').slice(4, 5)[0] + ' UTC';
+        document.getElementById('aiFeedStatus').textContent = 'CONNECTED';
+        document.getElementById('aiFeedStatus').style.color = 'var(--green)';
 
-    if (!response.ok) throw new Error("API Route Failed");
-    const data = await response.json();
-    const fullText = data.text;
-    cachedBriefingText = fullText; // Cache for chat bot context
-
-    // Parse stats JSON
-    const statsMatch = fullText.match(/<STATS>([\s\S]*?)<\/STATS>/);
-    let stats = null;
-    if (statsMatch) {
-      try { stats = JSON.parse(statsMatch[1].trim()); } catch(e) {}
+      } catch (err) {
+        el.innerHTML = `<p style="color:var(--red)">⚠ INTELLIGENCE FEED DISRUPTED — ${err.message}. Retrying on next cycle. Check sources directly via links →</p>`;
+        document.getElementById('aiFeedStatus').textContent = 'ERROR';
+        document.getElementById('aiFeedStatus').style.color = 'var(--red)';
+      }
     }
 
-    // Update casualty cards
-    if (stats) {
-      updateStats(stats);
-      if (stats.events) updateEventFeed(stats.events);
+    // ─── UPDATE CASUALTY STATS ────────────────────────────────────────────────────
+    function updateStats(s) {
+      const set = (id, val) => {
+        const el = document.getElementById(id);
+        if (el && val && val !== '—') {
+          el.textContent = val;
+        }
+      };
+      if (s.iran) {
+        set('iran-dead', s.iran.dead);
+        set('iran-injured', s.iran.injured);
+        set('iran-mil', s.iran.militaryDead);
+        set('iran-civ', s.iran.civilianDead);
+        set('iran-lead', s.iran.leadersKilled);
+        set('iran-sites', s.iran.sitesHit);
+      }
+      if (s.israel) {
+        set('israel-dead', s.israel.dead);
+        set('israel-injured', s.israel.injured);
+        set('israel-mil', s.israel.militaryDead);
+        set('israel-civ', s.israel.civilianDead);
+        set('israel-intercepted', s.israel.missilesIntercepted);
+        set('israel-missiles', s.israel.missilesFired);
+      }
+      if (s.us) {
+        set('us-dead', s.us.dead);
+        set('us-injured', s.us.injured);
+        set('us-mil', s.us.militaryDead);
+        set('us-bases', s.us.basesHit);
+        set('us-assets', s.us.assetsLost);
+        set('us-sorties', s.us.sorties);
+      }
+      if (s.proxies) {
+        set('proxy-fronts', s.proxies.activeFronts);
+        set('proxy-attacks', s.proxies.attacksLaunched);
+        set('proxy-hezbollah', s.proxies.hezbollah);
+        set('proxy-houthis', s.proxies.houthis);
+        set('proxy-kataib', s.proxies.kataibHB);
+        set('proxy-hamas', s.proxies.hamas);
+      }
+      if (s.global) {
+        set('global-oil', s.global.oilPrice);
+        set('global-hormuz', s.global.straitOfHormuz);
+        set('global-airspace', s.global.airspaceClosed);
+        set('global-un', s.global.unResponse);
+      }
     }
 
-    // Render briefing (strip STATS block)
-    const briefingText = fullText.replace(/<STATS>[\s\S]*?<\/STATS>/, '').trim();
-    const paragraphs = briefingText.split('\n').filter(p => p.trim()).map(p =>
-      `<p>${p.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>`
-    ).join('');
-    el.innerHTML = paragraphs || '<p style="color:var(--dim)">Briefing unavailable — check sources directly.</p>';
+    // ─── UPDATE EVENT FEED ────────────────────────────────────────────────────────
+    function updateEventFeed(events) {
+      const feed = document.getElementById('eventFeed');
+      const existing = feed.querySelectorAll('.event-item').length;
 
-    document.getElementById('lastUpdate').textContent = new Date().toUTCString().split(' ').slice(4,5)[0] + ' UTC';
-    document.getElementById('aiFeedStatus').textContent = 'CONNECTED';
-    document.getElementById('aiFeedStatus').style.color = 'var(--green)';
-
-  } catch(err) {
-    el.innerHTML = `<p style="color:var(--red)">⚠ INTELLIGENCE FEED DISRUPTED — ${err.message}. Retrying on next cycle. Check sources directly via links →</p>`;
-    document.getElementById('aiFeedStatus').textContent = 'ERROR';
-    document.getElementById('aiFeedStatus').style.color = 'var(--red)';
-  }
-}
-
-// ─── UPDATE CASUALTY STATS ────────────────────────────────────────────────────
-function updateStats(s) {
-  const set = (id, val) => {
-    const el = document.getElementById(id);
-    if (el && val && val !== '—') {
-      el.textContent = val;
-    }
-  };
-  if (s.iran) {
-    set('iran-dead', s.iran.dead);
-    set('iran-injured', s.iran.injured);
-    set('iran-mil', s.iran.militaryDead);
-    set('iran-civ', s.iran.civilianDead);
-    set('iran-lead', s.iran.leadersKilled);
-    set('iran-sites', s.iran.sitesHit);
-  }
-  if (s.israel) {
-    set('israel-dead', s.israel.dead);
-    set('israel-injured', s.israel.injured);
-    set('israel-mil', s.israel.militaryDead);
-    set('israel-civ', s.israel.civilianDead);
-    set('israel-intercepted', s.israel.missilesIntercepted);
-    set('israel-missiles', s.israel.missilesFired);
-  }
-  if (s.us) {
-    set('us-dead', s.us.dead);
-    set('us-injured', s.us.injured);
-    set('us-mil', s.us.militaryDead);
-    set('us-bases', s.us.basesHit);
-    set('us-assets', s.us.assetsLost);
-    set('us-sorties', s.us.sorties);
-  }
-  if (s.proxies) {
-    set('proxy-fronts', s.proxies.activeFronts);
-    set('proxy-attacks', s.proxies.attacksLaunched);
-    set('proxy-hezbollah', s.proxies.hezbollah);
-    set('proxy-houthis', s.proxies.houthis);
-    set('proxy-kataib', s.proxies.kataibHB);
-    set('proxy-hamas', s.proxies.hamas);
-  }
-  if (s.global) {
-    set('global-oil', s.global.oilPrice);
-    set('global-hormuz', s.global.straitOfHormuz);
-    set('global-airspace', s.global.airspaceClosed);
-    set('global-un', s.global.unResponse);
-  }
-}
-
-// ─── UPDATE EVENT FEED ────────────────────────────────────────────────────────
-function updateEventFeed(events) {
-  const feed = document.getElementById('eventFeed');
-  const existing = feed.querySelectorAll('.event-item').length;
-
-  events.slice(0, 15).forEach((ev, i) => {
-    const item = document.createElement('div');
-    item.className = `event-item ${ev.severity}`;
-    item.style.animationDelay = `${i * 0.05}s`;
-    item.innerHTML = `
+      events.slice(0, 15).forEach((ev, i) => {
+        const item = document.createElement('div');
+        item.className = `event-item ${ev.severity}`;
+        item.style.animationDelay = `${i * 0.05}s`;
+        item.innerHTML = `
       <div class="event-meta">
         <span class="event-time">${ev.time || '--:--'}</span>
         <span class="event-severity ${ev.severity}">${(ev.severity || 'info').toUpperCase()}</span>
@@ -1103,107 +1485,108 @@ function updateEventFeed(events) {
         <div class="event-detail">${ev.detail || ''}</div>
         <div class="event-source">SOURCE: ${ev.source || 'MULTIPLE'}</div>
       </div>`;
-    feed.insertBefore(item, feed.firstChild);
-  });
+        feed.insertBefore(item, feed.firstChild);
+      });
 
-  // Limit to 30 items
-  while (feed.children.length > 30) feed.removeChild(feed.lastChild);
-  document.getElementById('eventCount').textContent = `${feed.children.length} EVENTS`;
+      // Limit to 30 items
+      while (feed.children.length > 30) feed.removeChild(feed.lastChild);
+      document.getElementById('eventCount').textContent = `${feed.children.length} EVENTS`;
 
-  // Update ticker
-  if (events.length > 0) {
-    const tickerTrack = document.getElementById('tickerTrack');
-    events.slice(0, 5).forEach(ev => {
-      const span = document.createElement('span');
-      span.className = 'ticker-item';
-      span.textContent = ev.headline;
-      tickerTrack.appendChild(span);
+      // Update ticker
+      if (events.length > 0) {
+        const tickerTrack = document.getElementById('tickerTrack');
+        events.slice(0, 5).forEach(ev => {
+          const span = document.createElement('span');
+          span.className = 'ticker-item';
+          span.textContent = ev.headline;
+          tickerTrack.appendChild(span);
+        });
+      }
+    }
+
+    // ─── AUTO REFRESH ─────────────────────────────────────────────────────────────
+    function scheduleRefresh() {
+      clearTimeout(refreshTimer);
+      nextRefreshAt = Date.now() + REFRESH_INTERVAL;
+      refreshTimer = setTimeout(() => {
+        fetchAIBriefing();
+        scheduleRefresh();
+      }, REFRESH_INTERVAL);
+    }
+
+    function triggerRefresh() {
+      clearTimeout(refreshTimer);
+      fetchAIBriefing();
+      scheduleRefresh();
+    }
+
+    // ─── CHAT BOT FUNCTIONALITY ───────────────────────────────────────────────────
+    async function sendChatMessage() {
+      const inputEl = document.getElementById('chatInput');
+      const text = inputEl.value.trim();
+      if (!text) return;
+
+      const historyEl = document.getElementById('chatHistory');
+      const persona = document.getElementById('chatPersona').value;
+
+      // Append user message
+      const userMsg = document.createElement('div');
+      userMsg.className = 'chat-msg user';
+      userMsg.textContent = text;
+      historyEl.appendChild(userMsg);
+      inputEl.value = '';
+
+      // Append typing indicator
+      const waitMsg = document.createElement('div');
+      waitMsg.className = 'chat-msg ai chat-typing';
+      waitMsg.textContent = 'RECEIVING TRANSMISSION...';
+      historyEl.appendChild(waitMsg);
+      historyEl.scrollTop = historyEl.scrollHeight;
+
+      try {
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: text,
+            persona: persona,
+            context: cachedBriefingText || "No context fetched yet."
+          })
+        });
+
+        if (!response.ok) throw new Error("Chat Bot Failed");
+        const data = await response.json();
+
+        // Replace typing indicator with result
+        historyEl.removeChild(waitMsg);
+
+        const aiMsg = document.createElement('div');
+        aiMsg.className = 'chat-msg ai';
+        aiMsg.innerHTML = data.text.replace(/\ng/, '<br>');
+        historyEl.appendChild(aiMsg);
+      } catch (err) {
+        historyEl.removeChild(waitMsg);
+        const errMsg = document.createElement('div');
+        errMsg.className = 'chat-msg system';
+        errMsg.style.color = 'var(--red)';
+        errMsg.textContent = 'TRANSMISSION ERROR: ' + err.message;
+        historyEl.appendChild(errMsg);
+      }
+
+      historyEl.scrollTop = historyEl.scrollHeight;
+    }
+
+    // Map enter key
+    document.getElementById('chatInput')?.addEventListener('keyup', function (event) {
+      if (event.key === 'Enter') {
+        sendChatMessage();
+      }
     });
-  }
-}
 
-// ─── AUTO REFRESH ─────────────────────────────────────────────────────────────
-function scheduleRefresh() {
-  clearTimeout(refreshTimer);
-  nextRefreshAt = Date.now() + REFRESH_INTERVAL;
-  refreshTimer = setTimeout(() => {
+    // ─── INIT ─────────────────────────────────────────────────────────────────────
     fetchAIBriefing();
     scheduleRefresh();
-  }, REFRESH_INTERVAL);
-}
-
-function triggerRefresh() {
-  clearTimeout(refreshTimer);
-  fetchAIBriefing();
-  scheduleRefresh();
-}
-
-// ─── CHAT BOT FUNCTIONALITY ───────────────────────────────────────────────────
-async function sendChatMessage() {
-  const inputEl = document.getElementById('chatInput');
-  const text = inputEl.value.trim();
-  if (!text) return;
-
-  const historyEl = document.getElementById('chatHistory');
-  const persona = document.getElementById('chatPersona').value;
-
-  // Append user message
-  const userMsg = document.createElement('div');
-  userMsg.className = 'chat-msg user';
-  userMsg.textContent = text;
-  historyEl.appendChild(userMsg);
-  inputEl.value = '';
-
-  // Append typing indicator
-  const waitMsg = document.createElement('div');
-  waitMsg.className = 'chat-msg ai chat-typing';
-  waitMsg.textContent = 'RECEIVING TRANSMISSION...';
-  historyEl.appendChild(waitMsg);
-  historyEl.scrollTop = historyEl.scrollHeight;
-
-  try {
-    const response = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        message: text,
-        persona: persona,
-        context: cachedBriefingText || "No context fetched yet."
-      })
-    });
-
-    if (!response.ok) throw new Error("Chat Bot Failed");
-    const data = await response.json();
-    
-    // Replace typing indicator with result
-    historyEl.removeChild(waitMsg);
-    
-    const aiMsg = document.createElement('div');
-    aiMsg.className = 'chat-msg ai';
-    aiMsg.innerHTML = data.text.replace(/\ng/, '<br>');
-    historyEl.appendChild(aiMsg);
-  } catch (err) {
-    historyEl.removeChild(waitMsg);
-    const errMsg = document.createElement('div');
-    errMsg.className = 'chat-msg system';
-    errMsg.style.color = 'var(--red)';
-    errMsg.textContent = 'TRANSMISSION ERROR: ' + err.message;
-    historyEl.appendChild(errMsg);
-  }
-  
-  historyEl.scrollTop = historyEl.scrollHeight;
-}
-
-// Map enter key
-document.getElementById('chatInput')?.addEventListener('keyup', function(event) {
-    if (event.key === 'Enter') {
-        sendChatMessage();
-    }
-});
-
-// ─── INIT ─────────────────────────────────────────────────────────────────────
-fetchAIBriefing();
-scheduleRefresh();
-</script>
+  </script>
 </body>
+
 </html>
